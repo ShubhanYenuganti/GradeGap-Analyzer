@@ -6,7 +6,6 @@ import "../styles/Login.css"; // Reuse the same CSS for consistent style
 const Signup = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        username: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -19,7 +18,7 @@ const Signup = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const { username, email, password, confirmPassword } = formData;
+        const { email, password, confirmPassword } = formData;
 
         // Dummy signup logic
         if (password !== confirmPassword) {
@@ -27,7 +26,7 @@ const Signup = () => {
             return;
         }
 
-        if (!username || !email || !password) {
+        if (!email || !password) {
             setError("Please fill in all fields.");
             return;
         }
@@ -45,17 +44,6 @@ const Signup = () => {
                 <div className="login-box">
                     <h2>Sign Up</h2>
                     <form onSubmit={handleSubmit}>
-                        <div className="input-group">
-                            <label>Username</label>
-                            <input
-                                type="text"
-                                name="username"
-                                placeholder="Username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
                         <div className="input-group">
                             <label>Email</label>
                             <input

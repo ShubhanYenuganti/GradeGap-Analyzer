@@ -6,7 +6,7 @@ import "../styles/Login.css"; // Import your CSS file for styling
 const Login = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        identifier: "", // Can be email OR username
+        email: "",
         password: "",
     });
     const [error, setError] = useState("");
@@ -17,18 +17,18 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const { identifier, password } = formData;
+        const { email, password } = formData;
 
         // Dummy login logic
-        const validEmailsOrUsernames = ["test@example.com", "testuser"];
+        const validEmail = "test@example.com";
         const validPassword = "password123";
 
-        if (validEmailsOrUsernames.includes(identifier) && password === validPassword) {
+        if (email === validEmail && password === validPassword) {
             // Simulate successful login
             navigate("/home");
         } else {
             setError(
-                "Invalid email/username or password. Try 'test@example.com' or 'testuser' with 'password123'."
+                "Invalid email or password. Try 'test@example.com' and 'password123'."
             );
         }
     };
@@ -41,12 +41,12 @@ const Login = () => {
                     <h2>Login</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="input-group">
-                            <label>Email or Username</label>
+                            <label>Email</label>
                             <input
-                                type="text"
-                                name="identifier"
-                                placeholder="Email or Username"
-                                value={formData.identifier}
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                value={formData.email}
                                 onChange={handleChange}
                                 required
                             />
