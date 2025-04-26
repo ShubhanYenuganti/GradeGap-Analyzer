@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../api/api';
-import '../styles/FileUpload.css'; // CSS import is good ✅
+import '../styles/FileUpload.css';
 
-function FileUpload({ classId }) {
+function FileUpload() {
   const [file, setFile] = useState(null);
   const [category, setCategory] = useState('homework');
+  const [classId, setClassId] = useState('');
+
+  useEffect(() => {
+    const storedClassId = localStorage.getItem('createdClassId'); // 🆕 Retrieve classId
+    if (storedClassId) {
+      setClassId(storedClassId);
+    }
+  }, []);
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -17,17 +25,19 @@ function FileUpload({ classId }) {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('category', category);
-      formData.append('classId', classId);  // ✅ Fix field name to classId (backend expects this)
+      formData.append('classId', classId); // 🆕 Use retrieved classId
 
       await api.post('/api/classes/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
       alert('File uploaded successfully!');
-      setFile(null); // ✅ Reset file input after upload
+      setFile(null);
     } catch (error) {
-      console.error('File upload error:', error);
-      alert('Failed to upload file. See console for details.');
+      console.error('Upload error:', error);
+      alert('Failed to upload file.');
     }
   };
 
@@ -37,14 +47,8 @@ function FileUpload({ classId }) {
 
   return (
     <form onSubmit={handleUpload} className="file-upload-form">
-      <div className="file-input-wrapper">
-        <input type="file" onChange={handleFileChange} />
-      </div>
-      <select
-        value={category}
-        onChange={e => setCategory(e.target.value)}
-        className="category-select"
-      >
+      <input type="file" onChange={handleFileChange} />
+      <select value={category} onChange={e => setCategory(e.target.value)}>
         <option value="homework">Homework</option>
         <option value="quiz">Quiz</option>
         <option value="test">Test</option>
