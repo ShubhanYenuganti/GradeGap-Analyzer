@@ -5,12 +5,18 @@ import '../styles/CreateClassForm.css'; // ← import CSS file
 function CreateClassForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [objectives, setObjectives] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await api.post('/create_class', { title, description, objectives });
-    alert('Class created!');
+    try {
+      await api.post('/api/classes/create', { title, description });
+      alert('Class created!');
+      setTitle('');
+      setDescription('');
+    } catch (error) {
+      console.error('Error creating class:', error);
+      alert('Failed to create class. See console for details.');
+    }
   };
 
   return (

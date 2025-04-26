@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api/api';
-import '../styles/FileUpload.css'; // Make sure it's imported
+import '../styles/FileUpload.css'; // CSS import is good ✅
 
 function FileUpload({ classId }) {
   const [file, setFile] = useState(null);
@@ -12,14 +12,23 @@ function FileUpload({ classId }) {
       alert("Please select a file to upload.");
       return;
     }
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('category', category);
-    formData.append('class_id', classId);
 
-    await api.post('/upload_file', formData);
-    alert('File uploaded and insights updated!');
-    setFile(null); // Reset file input after upload
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('category', category);
+      formData.append('classId', classId);  // ✅ Fix field name to classId (backend expects this)
+
+      await api.post('/api/classes/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      alert('File uploaded successfully!');
+      setFile(null); // ✅ Reset file input after upload
+    } catch (error) {
+      console.error('File upload error:', error);
+      alert('Failed to upload file. See console for details.');
+    }
   };
 
   const handleFileChange = (e) => {
@@ -31,7 +40,11 @@ function FileUpload({ classId }) {
       <div className="file-input-wrapper">
         <input type="file" onChange={handleFileChange} />
       </div>
-      <select value={category} onChange={e => setCategory(e.target.value)} className="category-select">
+      <select
+        value={category}
+        onChange={e => setCategory(e.target.value)}
+        className="category-select"
+      >
         <option value="homework">Homework</option>
         <option value="quiz">Quiz</option>
         <option value="test">Test</option>
