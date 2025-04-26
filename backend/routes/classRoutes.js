@@ -1,11 +1,11 @@
+// inside classRoutes.js
+
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const Class = require('../models/Class');
 const multerS3 = require('multer-s3');
 const aws = require('aws-sdk');
-
-require('dotenv').config();
+const Class = require('../models/Class');
 
 // AWS Config
 aws.config.update({
@@ -16,19 +16,7 @@ aws.config.update({
 
 const s3 = new aws.S3();
 
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.AWS_BUCKET_NAME,
-    metadata: (req, file, cb) => {
-      cb(null, { fieldName: file.fieldname });
-    },
-    key: (req, file, cb) => {
-      const filename = `${Date.now()}-${file.originalname}`;
-      cb(null, filename);
-    }
-  })
-});
+// ✅ No upload initialized yet!
 
 // POST /api/classes/create
 router.post('/create', async (req, res) => {
@@ -43,33 +31,54 @@ router.post('/create', async (req, res) => {
 });
 
 // POST /api/classes/upload
-router.post('/upload', upload.single('file'), async (req, res) => {
-  const { classId, category } = req.body;
+router.post('/upload', (req, res, next) => {
+  const upload = multer({
+    storage: multerS3({
+      s3: s3,
+      bucket: process.env.AWS_BUCKET_NAME,
+      metadata: (req, file, cb) => {
+        cb(null, { fieldName: file.fieldname });
+      },
+      key: (req, file, cb) => {
+        const filename = `${Date.now()}-${file.originalname}`;
+        cb(null, filename);
+      }
+    })
+  }).single('file');
 
-  try {
-    const existingClass = await Class.findById(classId);
-    if (!existingClass) {
-      return res.status(404).json({ error: 'Class not found' });
+  upload(req, res, async function (err) {
+    if (err) {
+      console.error('UPLOAD ERROR:', err);
+      return res.status(500).json({ error: 'Failed to upload file' });
     }
 
-    const newFile = {
-      filename: req.file.key,         // S3 file key
-      category,
-      path: req.file.location         // Public S3 URL
-    };
+    const { classId, category } = req.body;
 
-    existingClass.files.push(newFile);
-    await existingClass.save();
+    try {
+      const existingClass = await Class.findById(classId);
+      if (!existingClass) {
+        return res.status(404).json({ error: 'Class not found' });
+      }
 
-    res.json({ 
-      message: 'File uploaded successfully', 
-      fileUrl: req.file.location      // Send URL back to frontend
-    });
+      const newFile = {
+        filename: req.file.key,         // S3 file key
+        category,
+        path: req.file.location         // Public S3 URL
+      };
 
-  } catch (error) {
-    console.error('UPLOAD ERROR:', error);   // <--- add this
-    res.status(500).json({ error: 'Failed to upload file' });
-  }
+      existingClass.files.push(newFile);
+      await existingClass.save();
+
+      res.json({ 
+        message: 'File uploaded successfully', 
+        fileUrl: req.file.location      // Send URL back to frontend
+      });
+
+    } catch (error) {
+      console.error('UPLOAD ERROR:', error);
+      res.status(500).json({ error: 'Failed to upload file' });
+    }
+  });
 });
 
 // GET /api/classes/insights/:classId
