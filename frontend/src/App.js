@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import CreateClassPage from './pages/CreateClassPage';
 import UploadPage from './pages/UploadPage';
 import InsightsPage from './pages/InsightsPage';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         <Route path="/create" element={<CreateClassPage />} />
         <Route path="/upload" element={<UploadPage />} />
         <Route path="/insights" element={<InsightsPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </Router>
   );
