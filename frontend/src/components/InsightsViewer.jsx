@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import api from '../api/api'; // Make sure this points correctly to your axios instance
-import { GoogleGenerativeAI } from "@google/generative-ai"; // Still imported, but no longer directly used
+import api from '../api/api';
 
-async function generateRandomInsight() {
-    const randomPrompt = "Give me a short random inspirational insight for a classroom setting.";
+// Now generateRandomInsight accepts courseTitle and files
+async function generateRandomInsight(courseTitle, files) {
+    // Extract filenames
+    const fileNames = files.map(file => file.filename).join(', ');
+
+    const randomPrompt = `
+        You are helping students in a classroom called "${courseTitle}".
+        They have uploaded the following files: ${fileNames}.
+        Based on this, generate a short, motivational, and inspiring insight that is connected to their learning.
+    `;
+
     try {
         const response = await api.post('/api/gemini/generate', { prompt: randomPrompt });
         const generatedText = response.data.candidates[0].content.parts[0].text;
@@ -25,7 +33,7 @@ function InsightsViewer() {
         const fetchedClasses = response.data;
 
         const updatedClasses = await Promise.all(fetchedClasses.map(async (classItem) => {
-          const randomInsight = await generateRandomInsight();
+          const randomInsight = await generateRandomInsight(classItem.title, classItem.files || []);
           return { ...classItem, insights: randomInsight };
         }));
 
