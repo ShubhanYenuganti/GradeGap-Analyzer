@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api/api';
+import '../styles/InsightsViewer.css'; // Import the CSS file
 
 // Now generateRandomInsight accepts courseTitle and files
 async function generateRandomInsight(courseTitle, files) {
@@ -25,6 +26,8 @@ async function generateRandomInsight(courseTitle, files) {
 function InsightsViewer() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedClass, setSelectedClass] = useState('');
+  const [insight, setInsight] = useState('');
 
   useEffect(() => {
     const fetchClassesAndGenerateInsights = async () => {
@@ -48,18 +51,45 @@ function InsightsViewer() {
     fetchClassesAndGenerateInsights();
   }, []);
 
+  // Handle class selection from the dropdown
+  const handleClassChange = (e) => {
+    const selectedTitle = e.target.value;
+    setSelectedClass(selectedTitle);
+    
+    // Find the selected class by title
+    const selectedClassItem = classes.find((classItem) => classItem.title === selectedTitle);
+    setInsight(selectedClassItem ? selectedClassItem.insights : '');
+  };
+
   if (loading) {
-    return <div>Loading insights...</div>;
+    return <div className="loading">Loading insights...</div>;
   }
 
   return (
     <div className="insights-viewer">
-      {classes.map((classItem) => (
-        <div key={classItem._id} className="class-insight-card">
-          <h2>{classItem.title}</h2>
-          <pre>{classItem.insights}</pre>
-        </div>
-      ))}
+      <div className="insights-box">
+        {/* Dropdown to select a class */}
+        <select
+          value={selectedClass}
+          onChange={handleClassChange}
+          className="category-select"
+        >
+          <option value="" disabled>Select a Class</option>
+          {classes.map((classItem) => (
+            <option key={classItem._id} value={classItem.title}>
+              {classItem.title} {/* Displaying class title */}
+            </option>
+          ))}
+        </select>
+
+        {/* Display insights for the selected class */}
+        {insight && (
+          <div className="class-insight-card">
+            <h2>{selectedClass}</h2>
+            <pre>{insight}</pre>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
