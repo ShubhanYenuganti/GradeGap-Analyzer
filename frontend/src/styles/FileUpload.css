@@ -1,19 +1,19 @@
-/* Center the container vertically */
+/* Center the container vertically and horizontally without scrolling */
 .file-upload-form {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2.5rem; /* More spacing between main sections */
-  background-color: #1e1e1e;
+  background-color: #2d2d2d;
   padding: 3rem;
   border-radius: 10px;
-  max-width: 500px; /* Made the box wider */
+  max-width: 500px; /* Set max-width to prevent it from becoming too large */
   width: 90%; /* Responsive width */
-  margin: 2rem auto;
-  position: absolute;
-  top: 55%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  margin: 3rem auto; /* Adjust margin to center the form without pushing too far down */
+  box-sizing: border-box; /* Ensure padding is included in the width */
+  box-shadow: 0 0 10px rgba(200, 200, 200, 0.1); /* Optional: Add box-shadow for styling */
+  max-height: 90vh; /* Ensure the form fits within the viewport */
+  overflow-y: auto; /* Allow scrolling inside the form if needed */
 }
 
 /* Common input, select, and button style */
@@ -37,7 +37,7 @@
 
 /* Class ID form specific - input and button side by side */
 .class-id-form {
-  flex-direction: row;
+  display: flex;
   justify-content: center;
   gap: 1.5rem; /* More gap between input and button */
   width: 100%;
@@ -48,11 +48,13 @@
   padding: 0.8rem;
   border-radius: 8px;
   border: 1px solid #555;
-  background-color: #2c2c2c;
+  background-color: #1f1f1f;
   color: #f0f0f0;
   font-size: 1rem;
-  flex: 1;
-  max-width: 400px; /* Wider input field */
+  flex: 1; /* Allows the input to take the available space */
+  width: 100%; /* Input should take up the full width available */
+  max-width: 400px; /* Set a max-width to prevent it from becoming too large */
+  box-sizing: border-box;
 }
 
 /* Style the "Find Class" button */
@@ -65,7 +67,7 @@
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  flex-shrink: 0;
+  flex-shrink: 0; /* Prevent the button from shrinking */
 }
 
 .fetch-class-id-button:hover {
@@ -84,8 +86,9 @@
   text-align: center;
   display: inline-block;
   width: 100%;
-  max-width: 400px;
+  max-width: 400px; /* Set a max-width to control the size */
   transition: background-color 0.3s ease;
+  box-sizing: border-box;
 }
 
 .custom-file-upload:hover {
@@ -100,19 +103,20 @@ input[type="file"] {
 /* Style the category select */
 .category-select {
   width: 100%;
-  max-width: 400px;
+  max-width: 400px; /* Set a max-width to control the size */
   padding: 0.8rem;
   border-radius: 8px;
   border: 1px solid #555;
-  background-color: #2c2c2c;
+  background-color: #1f1f1f;
   color: #f0f0f0;
   font-size: 1rem;
+  box-sizing: border-box;
 }
 
 /* Style the upload button */
 .upload-button {
   width: 100%;
-  max-width: 400px;
+  max-width: 400px; /* Set a max-width to control the size */
   padding: 0.8rem;
   border-radius: 8px;
   border: 1px solid #555;
@@ -121,8 +125,57 @@ input[type="file"] {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  box-sizing: border-box;
 }
 
 .upload-button:hover {
   background-color: #fcb045;
+}
+
+/* Media Queries for responsiveness */
+
+/* For larger screens (laptops and above) */
+@media (min-width: 1024px) {
+  .file-upload-form {
+    width: 70%; /* Slightly smaller form width for larger screens */
+    max-width: 700px; /* Ensure form doesn't grow too large */
+  }
+}
+
+/* For medium screens (tablets and below) */
+@media (max-width: 1024px) {
+  .file-upload-form {
+    width: 80%; /* Use 80% of the width on smaller screens */
+    padding: 2rem;
+  }
+
+  .file-upload-form input[type="text"],
+  .fetch-class-id-button,
+  .custom-file-upload,
+  .upload-button {
+    max-width: 100%; /* Allow full width on smaller screens */
+  }
+}
+
+/* For small screens (phones) */
+@media (max-width: 768px) {
+  .file-upload-form {
+    width: 90%; /* Use 90% of the width on very small screens */
+    padding: 1.5rem;
+  }
+
+  .file-upload-form input[type="text"],
+  .fetch-class-id-button,
+  .custom-file-upload,
+  .upload-button {
+    max-width: 100%;
+    font-size: 0.9rem; /* Slightly reduce font size */
+  }
+}
+
+@media (max-width: 480px) {
+  .file-upload-form {
+    width: 95%; /* Even smaller on very narrow screens */
+    padding: 1rem;
+  }
 }
