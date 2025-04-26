@@ -1,5 +1,3 @@
-// inside classRoutes.js
-
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -16,7 +14,6 @@ aws.config.update({
 
 const s3 = new aws.S3();
 
-// ✅ No upload initialized yet!
 
 // POST /api/classes/create
 router.post('/create', async (req, res) => {
@@ -61,9 +58,9 @@ router.post('/upload', (req, res, next) => {
       }
 
       const newFile = {
-        filename: req.file.key,         // S3 file key
+        filename: req.file.key,        
         category,
-        path: req.file.location         // Public S3 URL
+        path: req.file.location         
       };
 
       existingClass.files.push(newFile);
@@ -71,7 +68,7 @@ router.post('/upload', (req, res, next) => {
 
       res.json({ 
         message: 'File uploaded successfully', 
-        fileUrl: req.file.location      // Send URL back to frontend
+        fileUrl: req.file.location      
       });
 
     } catch (error) {
@@ -99,3 +96,34 @@ router.get('/insights/:classId', async (req, res) => {
 });
 
 module.exports = router;
+
+// GET /api/classes/getClassId/:title
+router.get('/getClassId/:title', async (req, res) => {
+  const { title } = req.params;
+
+  try {
+    const existingClass = await Class.findOne({
+      title: { $regex: `^${title.trim()}$`, $options: 'i' }
+    });
+
+    if (!existingClass) {
+      return res.status(404).json({ error: 'Class not found' });
+    }
+
+    res.json({ classId: existingClass._id });
+  } catch (error) {
+    console.error('GET CLASS ID ERROR:', error);
+    res.status(500).json({ error: 'Failed to fetch class ID' });
+  }
+});
+
+// ✅ GET /api/classes/all
+router.get('/all', async (req, res) => {
+  try {
+    const classes = await Class.find();  
+    res.json(classes);                   
+  } catch (error) {
+    console.error('GET ALL CLASSES ERROR:', error);
+    res.status(500).json({ error: 'Failed to fetch classes' });
+  }
+});
