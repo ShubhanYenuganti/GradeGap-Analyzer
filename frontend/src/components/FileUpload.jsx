@@ -58,6 +58,8 @@ function FileUpload() {
 
   return (
     <div className="file-upload-form">
+      
+      {/* Form to fetch Class ID */}
       <form onSubmit={handleFetchClassId} className="class-id-form">
         <input
           type="text"
@@ -68,8 +70,16 @@ function FileUpload() {
         <button type="submit" className="fetch-class-id-button">Find Class</button>
       </form>
 
+      {/* Form to upload a file */}
       <form onSubmit={handleUpload}>
-        <input type="file" onChange={handleFileChange} />
+        <label htmlFor="file-upload" className="custom-file-upload">
+          {file ? file.name : "Choose File"}
+        </label>
+        <input
+          id="file-upload"
+          type="file"
+          onChange={handleFileChange}
+        />
 
         <select value={category} onChange={e => setCategory(e.target.value)} className="category-select">
           <option value="" disabled>Select a Category</option>
@@ -80,6 +90,7 @@ function FileUpload() {
 
         <button type="submit" className="upload-button">Upload</button>
       </form>
+      
     </div>
   );
 }

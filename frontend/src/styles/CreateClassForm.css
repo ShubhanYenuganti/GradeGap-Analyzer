@@ -30,6 +30,7 @@
     border-radius: 8px;
     cursor: pointer;
     transition: 0.3s;
+    font-size: 1rem;
   }
   
   .create-class-form button:hover {
