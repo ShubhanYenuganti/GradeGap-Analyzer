@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_2_0_ENDPOINT = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-pro:generateContent';
+const GEMINI_2_0_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 async function generateInsightsFromText(text) {
   const response = await axios.post(
