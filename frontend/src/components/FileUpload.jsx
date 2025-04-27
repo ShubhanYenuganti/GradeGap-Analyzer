@@ -2,25 +2,25 @@ import React, { useState, useEffect } from 'react';
 import api from '../api/api'; // Make sure this points correctly to your axios instance
 import '../styles/FileUpload.css'; // Importing your styles
 
-// Now generateRandomInsight accepts courseTitle and files
-async function generateRandomInsight(courseTitle, files) {
-  const fileNames = files.map(file => file.filename).join(', ');
+// // Now generateRandomInsight accepts courseTitle and files
+// async function generateRandomInsight(courseTitle, files) {
+//   const fileNames = files.map(file => file.filename).join(', ');
 
-  const randomPrompt = `
-    You are helping students in a classroom called "${courseTitle}".
-    They have uploaded the following files: ${fileNames}.
-    Based on this, generate a short, motivational, and inspiring insight that is connected to their learning.
-  `;
+//   const randomPrompt = `
+//     You are helping students in a classroom called "${courseTitle}".
+//     They have uploaded the following files: ${fileNames}.
+//     Based on this, generate a short, motivational, and inspiring insight that is connected to their learning.
+//   `;
 
-  try {
-    const response = await api.post('/api/gemini/generate', { prompt: randomPrompt });
-    const generatedText = response.data.candidates[0].content.parts[0].text;
-    return generatedText;
-  } catch (error) {
-    console.error("Error generating content:", error);
-    return "Failed to generate insight.";
-  }
-}
+//   try {
+//     const response = await api.post('/api/gemini/generate', { prompt: randomPrompt });
+//     const generatedText = response.data.candidates[0].content.parts[0].text;
+//     return generatedText;
+//   } catch (error) {
+//     console.error("Error generating content:", error);
+//     return "Failed to generate insight.";
+//   }
+// }
 
 function FileUpload() {
   const [file, setFile] = useState(null);
@@ -62,31 +62,38 @@ function FileUpload() {
       alert("Please select a file, a category, and choose a class.");
       return;
     }
-
+  
     try {
+      // Find the classId matching the selected className
+      const selectedClass = classes.find(cls => cls.title === className);
+      if (!selectedClass) {
+        alert("Selected class not found!");
+        return;
+      }
+  
       const formData = new FormData();
       formData.append('file', file);
       formData.append('category', category);
-      formData.append('className', className); // Send the selected class title
-
-      const response = await fetch('/api/classes/upload', {
-        method: 'POST',
-        body: formData,
+      formData.append('classId', selectedClass._id); // ✅ Correctly sending classId
+  
+      const response = await api.post('/api/classes/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-
-      if (response.ok) {
+  
+      if (response.status === 200) {
         alert('File uploaded successfully!');
-        setFile(null); // Reset file state
-        setCategory(''); // Reset category state
-        setClassName(''); // Reset class selection
+        setFile(null);
+        setCategory('');
+        setClassName('');
       } else {
         alert('Failed to upload file.');
       }
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('Upload error:', error.response?.data || error.message);
       alert('Failed to upload file.');
     }
   };
+  
 
   if (loading) {
     return <div>Loading classes...</div>;

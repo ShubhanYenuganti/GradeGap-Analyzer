@@ -1,48 +1,46 @@
-const sharp = require('sharp')
-const pdf = require('pdf-parse')
-const {promises: fs} = require('fs')
+const { createCanvas } = require('canvas');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 async function prepareFileBuffer(fileUrl, mimetype) {
-    const fileBuffer = await fetch(fileUrl).then(res => res.arrayBuffer());
-    const buffer = Buffer.from(fileBuffer)
+  const fileBuffer = await fetch(fileUrl).then(res => res.arrayBuffer());
+  const buffer = Buffer.from(fileBuffer);
+
+  if (mimetype === 'application/pdf') {
+    console.log('📄 Processing PDF purely in Node.js...');
     
-    if (mimetype == 'application/pdf') {
-        // Pdf Input
-        const pdfData = await pdf(buffer)
+    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
 
-        const pages = pdfData.numpages || 1; // fallback to 1 if not available
-        const textLength = pdfData.text.trim().length;
-        // Dynamic threshold: e.g., 50 characters minimum per page
-        const dynamicThreshold = pages * 50;
-        
-        
-        if (textLength > dynamicThreshold) {
-            // If it detects more than 100 actual characters, its a legit text-PDF
-            // If not then it will be interpreted as an image scanned as a PDF
-            console.log('Good text-based PDF detected')
-            return { buffer, cleanMimeType: 'application/pdf'}
-        } else {
-            console.log('Weak PDF detected, treating as scanned image')
-            // For now may further optimize later but send to gemini as a pdf
-            return {buffer, cleanMimeType: 'application/pdf'}
-        }
+    const pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
+    const pageBuffers = [];
+
+    for (let i = 1; i <= pdfDoc.numPages; i++) {
+      const page = await pdfDoc.getPage(i);
+      const viewport = page.getViewport({ scale: 2.0 });
+      const canvas = createCanvas(viewport.width, viewport.height);
+      const context = canvas.getContext('2d');
+
+      const renderContext = {
+        canvasContext: context,
+        viewport: viewport
+      };
+
+      await page.render(renderContext).promise;
+
+      const pageBuffer = canvas.toBuffer('image/png');
+      pageBuffers.push(pageBuffer);
     }
-    else if (mimetype.startsWith('image/')) {
-        // Image input
-        const preprocessed = await preprocessImage(buffer);
-        return {buffer: preprocessed, cleanMimeType: 'image/png'}
-    }
+
+    console.log(`✅ Converted PDF into ${pageBuffers.length} images!`);
+    return { pageBuffers, cleanMimetype: 'image/png' }; // <-- Always an array
+  } 
+  else if (mimetype.startsWith('image/')) {
+    console.log('🖼️ Received image directly.');
+    return { pageBuffers: [buffer], cleanMimetype: 'image/png' }; // <-- Always an array
+  }
+  
+  // 🛡️ Default safeguard:
+  console.error('❌ Unsupported mimetype:', mimetype);
+  return { pageBuffers: [], cleanMimetype: 'image/png' };
 }
 
-async function preprocessImage(buffer) {
-    return await sharp(buffer)
-        .resize({ width: 1600 })
-        .grayscale()
-        .normalize()
-        .sharpen({ sigma: 1 })
-        .threshold(180)
-        .toFormat('png')
-        .toBuffer();
-}
-
-module.exports = { prepareFileBuffer }
+module.exports = { prepareFileBuffer };

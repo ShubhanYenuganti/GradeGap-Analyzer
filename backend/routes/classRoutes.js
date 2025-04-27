@@ -6,10 +6,10 @@ const aws = require('aws-sdk');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const { prepareFileBuffer } = require('../utils/prepareFileForGemini');
 const { extractTextFromFile } = require('../services/geminiFileReader');
-const { generateInsightsFromText } = require('../services/geminiService');
+const { generateInsights } = require('../services/geminiService');
 const Class = require('../models/Class');
 
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: '../.env' }); // ✅ Load env vars
 
 // AWS Config
 aws.config.update({
@@ -26,7 +26,7 @@ const s3 = new aws.S3();
 router.post('/upload', (req, res) => {
   const upload = multer({
     storage: multerS3({
-      s3,
+      s3: s3,
       bucket: process.env.AWS_BUCKET_NAME,
       metadata: (req, file, cb) => {
         cb(null, { fieldName: file.fieldname });
@@ -52,7 +52,7 @@ router.post('/upload', (req, res) => {
         return res.status(404).json({ error: 'Class not found' });
       }
 
-      // Save file metadata
+      // Save uploaded file info
       const newFile = {
         filename: req.file.key,
         category,
@@ -63,45 +63,32 @@ router.post('/upload', (req, res) => {
 
       console.log('⏬ Downloading file from S3...');
       const fileUrl = req.file.location;
+      const fileBuffer = await fetch(fileUrl).then(res => res.arrayBuffer());
       const mimetype = req.file.mimetype;
 
-      if (!fileUrl || !fileUrl.startsWith('http')) {
-        console.error('❌ Invalid file URL:', fileUrl);
-        return res.status(500).json({ error: 'Invalid file URL after upload.' });
-      }
+      console.log('🧹 Preprocessing file...');
+      const { pageBuffers, cleanMimetype } = await prepareFileBuffer(fileUrl, mimetype);
 
-      // Preprocess file
-      console.log('🧹 Preprocessing file for Gemini...');
-      const { buffer, cleanMimeType } = await prepareFileBuffer(fileUrl, mimetype);
+      const base64Images = pageBuffers.map(pageBuffer => pageBuffer.toString('base64'));
 
-      // Base64 encode
-      const base64Data = buffer.toString('base64');
+      console.log('🤖 Extracting text with Gemini 1.5...');
+      const extractedText = await extractTextFromFile(base64Images, cleanMimetype);
 
-      // Extract text using Gemini 1.5
-      console.log('🤖 Extracting text using Gemini 1.5...');
-      const extractedText = await extractTextFromFile(base64Data, cleanMimeType);
+      // 🧠 Now generate insights using Gemini 2.0
+      const courseDescription = existingClass.description || "This course covers mathematics, statistics, and problem-solving.";
+      const aiInsights = await generateInsights(extractedText, courseDescription);
 
-      if (!extractedText.trim()) {
-        console.warn('⚠️ No text extracted.');
-        return res.status(500).json({ error: 'Failed to extract text from document.' });
-      }
-
-      // Generate insights using Gemini 2.0
-      console.log('🧠 Generating insights using Gemini 2.0...');
-      const insights = await generateInsightsFromText(extractedText);
-
-      existingClass.insights = insights;
+      existingClass.insights = aiInsights;
       await existingClass.save();
 
-      res.json({ 
+      res.json({
         message: 'File uploaded and AI insights generated successfully!',
-        fileUrl: req.file.location,
-        insights: insights
+        fileUrl: req.file.location
       });
 
     } catch (error) {
       console.error('UPLOAD+AI ERROR:', error.response?.data || error.message);
-      res.status(500).json({ error: 'Failed to process upload and generate AI insights.' });
+      res.status(500).json({ error: 'Failed to process upload and generate insights.' });
     }
   });
 });
