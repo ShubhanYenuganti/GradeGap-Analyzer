@@ -21,7 +21,7 @@ ${courseDescription}
 Exam, Quiz, or Homework:
 ${type}
 
-Student Exam Content:
+Content:
 ${parsedText}
 
 Your Output:
