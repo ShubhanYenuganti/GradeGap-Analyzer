@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api/api'; // Your axios instance
+import '../styles/InsightsViewer.css'; // <-- You can create this for extra animations (optional)
 
 function InsightsViewer() {
   const [classes, setClasses] = useState([]);
@@ -28,10 +29,10 @@ function InsightsViewer() {
 
     try {
       const response = await api.get(`/api/classes/insights/${selectedId}`);
-      setInsight(response.data.insights);
+      setInsight(response.data.insights || '<div>No insights available.</div>');
     } catch (error) {
       console.error('Error fetching insights:', error);
-      setInsight('Failed to fetch insights.');
+      setInsight('<div>Failed to fetch insights.</div>');
     }
   };
 
@@ -58,9 +59,11 @@ function InsightsViewer() {
 
         {/* Show insight if available */}
         {insight && (
-          <div className="class-insight-card">
-            <h2>Insights</h2>
-            <pre>{insight}</pre>
+          <div className="class-insight-card fade-in">
+            <div
+              className="insight-content prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: insight }}
+            />
           </div>
         )}
       </div>
