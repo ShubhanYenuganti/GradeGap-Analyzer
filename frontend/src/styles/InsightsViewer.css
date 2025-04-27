@@ -1,41 +1,150 @@
-/* InsightsViewer.css */
-.fade-in {
-  animation: fadeIn 0.7s ease-in;
-}
-
+/* === Animations === */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-/* Prose typography */
-.prose {
-  font-family: 'Inter', sans-serif;
-  color: #f0f0f0;
-  line-height: 1.7;
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }
 
-.prose h3 {
-  font-size: 1.5rem;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+/* === Global Body Background === */
+body {
+  margin: 0;
+  background-color: #0d0d0d;
+}
+
+/* === Header === */
+.header {
+  background-color: #0d0d0d;
+  color: #ffd700;
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 2.5rem;
   font-weight: bold;
+  animation: fadeIn 1s ease-in;
 }
 
-/* Color based on sections */
-.prose h3:has(> span:contains("🏆")) {
-  color: #28a745; /* green */
+/* === Main Layout Containers === */
+.insights-viewer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  min-height: 80vh;
+  background-color: #0d0d0d;
 }
 
-.prose h3:has(> span:contains("🔍")) {
-  color: #ffc107; /* yellow */
+.insights-box {
+  background: #1e1e1e;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 850px;
 }
 
-.prose h3:has(> span:contains("🚀")) {
-  color: #17a2b8; /* blue */
+/* === Dropdown === */
+.category-select {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #555;
+  border-radius: 0.5rem;
+  color: #f0f0f0;
+  font-size: 1rem;
+  outline: none;
+  margin-bottom: 1rem;
+  appearance: none;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-/* Fallback if :has() isn't supported yet */
-.prose h3 {
-  color: #ffd700; /* general gold color */
+.category-select:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #777;
+}
+
+/* === Insight Section Container === */
+.insight-section-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* === Insight Cards === */
+.class-insight-card {
+  background: #2a2a2a;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease;
+  width: 100%;
+}
+
+.class-insight-card:hover {
+  transform: translateY(-5px);
+}
+
+/* === Special Styling for Sections === */
+.insight-achievement {
+  border-left: 6px solid #28a745; /* green */
+}
+
+.insight-focus {
+  border-left: 6px solid #ffc107; /* yellow */
+}
+
+.insight-growth {
+  border-left: 6px solid #17a2b8; /* blue */
+}
+
+/* === Section Titles === */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #ffd700;
+  text-align: left;
+}
+
+/* === Section Bullet Lists === */
+.section-bullets {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.section-bullets li {
+  font-size: 1rem;
+  color: #f0f0f0;
+  margin-bottom: 1rem; /* Extra space between bullets */
+  line-height: 1.6;
+  text-align: left;
+}
+
+/* === Loading State === */
+.loading {
+  color: #f0f0f0;
+  font-size: 1.5rem;
+  animation: pulse 1.5s infinite;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* === Responsive Tweaks === */
+@media (max-width: 768px) {
+  .insights-box {
+    padding: 1.5rem;
+  }
+
+  .class-insight-card {
+    padding: 1.25rem;
+  }
+
+  .category-select {
+    font-size: 0.95rem;
+  }
 }

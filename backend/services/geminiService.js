@@ -60,60 +60,60 @@ async function synthesizeInsights(courseInsights, aiInsights) {
   console.log('🔵 Synthesizing insights together...');
 
   const prompt = `
-You are generating a personalized student performance report.
-
-You have two sources of input:
-- "Course Insights": General trends observed across the entire course cohort (common struggles, common strengths).
-- "AI Insights": Analysis based on a **newly uploaded assignment, exam, or homework submission** for this specific student.
-
-Your job:
-- **Synthesize** the overall Course Insights and the AI Insights from the new submission together.
-- Identify what the student is doing particularly well **relative to course trends**.
-- Identify where the student **still needs improvement**.
-- Provide actionable next steps.
-
-Output Format:
-Return the report as **plain JSX inside a Markdown code block** (triple backticks).
-
-Example output:
-
-\`\`\`jsx
-<>
-  <h3>🏆 Progress Made</h3>
-  <ul>
-    <li>First strength</li>
-    <li>Second strength</li>
-  </ul>
-
-  <h3>🔍 Areas of Improvement</h3>
-  <ul>
-    <li>First area</li>
-    <li>Second area</li>
-  </ul>
-
-  <h3>🚀 Next Steps</h3>
-  <ol>
-    <li>First next step</li>
-    <li>Second next step</li>
-  </ol>
-</>
-\`\`\`
-
-✅ Only output valid JSX inside the code block.  
-✅ No extra commentary, no explanation outside the code block.  
-✅ Use <ul> and <li> for unordered points; use <ol> and <li> for next steps.  
-✅ Group points meaningfully: Synthesize inputs, do not simply copy-paste.
-
----
-
-Here are the inputs:
-
-Course Insights:
-${courseInsights}
-
-AI Insights:
-${aiInsights}
-`;
+  You are generating a personalized student performance report.
+  
+  You have two sources of input:
+  - "Course Insights": General trends observed across the entire course cohort.
+  - "AI Insights": Analysis based on a newly submitted assignment.
+  
+  Your job:
+  - Synthesize the Course Insights and the AI Insights together.
+  - Identify key strengths and areas of improvement.
+  - Provide clear actionable next steps.
+  
+  Output Format:
+  ✅ Return the report as plain JSX inside a Markdown code block (triple backticks).
+  ✅ Use ONLY <ul> and <li> tags for **all** bullet points (no <ol> needed).
+  ✅ Group points clearly under the following headings:
+  
+  Example output:
+  
+  \`\`\`jsx
+  <>
+    <h3>🏆 Strengths</h3>
+    <ul>
+      <li>Mastered loops and conditionals.</li>
+      <li>Effective recursion use in basic problems.</li>
+    </ul>
+  
+    <h3>🔍 Areas for Improvement</h3>
+    <ul>
+      <li>Difficulty with dynamic programming optimizations.</li>
+      <li>Struggles with recursion debugging.</li>
+    </ul>
+  
+    <h3>🚀 Recommended Next Steps</h3>
+    <ul>
+      <li>Review dynamic programming strategies.</li>
+      <li>Complete recursion debugging exercises.</li>
+    </ul>
+  </>
+  \`\`\`
+  
+  Important Rules:
+  - ✅ Only output valid JSX inside the code block.
+  - ✅ Do not output any commentary or explanation.
+  - ✅ Every point must be inside a <ul> and <li>.
+  - ✅ Each section should have a clear heading (h3) and bullet list underneath.
+  
+  ---
+  Course Insights:
+  ${courseInsights}
+  
+  AI Insights:
+  ${aiInsights}
+  `;
+  
 
   const synthResponse = await axios.post(
     `${GEMINI_2_ENDPOINT}?key=${GEMINI_API_KEY}`,
