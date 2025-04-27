@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/NavBar.jsx";
-import "../styles/Login.css"; // Reuse the same CSS for consistent style
+import "../styles/Login.css";
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -19,23 +19,35 @@ const Signup = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const { email, password, confirmPassword } = formData;
-
-        // Dummy signup logic
+    
         if (password !== confirmPassword) {
             setError("Passwords do not match.");
             return;
         }
-
+    
         if (!email || !password) {
             setError("Please fill in all fields.");
             return;
         }
-
-        // In a real app, you would send a POST request to your backend here.
-
-        // Simulate successful signup
-        navigate("/home");
+    
+        // Fetch existing users from localStorage
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+    
+        // Check if email already exists
+        const existingUser = users.find(user => user.email === email);
+        if (existingUser) {
+            setError("Email already in use.");
+            return;
+        }
+    
+        // Add new user
+        users.push({ email, password });
+        localStorage.setItem('users', JSON.stringify(users));
+    
+        // 🚫 Don't auto-login after signup
+        navigate('/login'); // ✅ Force user to go log in manually
     };
+    
 
     return (
         <div>

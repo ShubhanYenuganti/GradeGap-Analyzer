@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/NavBar.jsx";
-import "../styles/Login.css"; // Import your CSS file for styling
+import "../styles/Login.css";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -19,17 +19,16 @@ const Login = () => {
         e.preventDefault();
         const { email, password } = formData;
 
-        // Dummy login logic
-        const validEmail = "test@example.com";
-        const validPassword = "password123";
+        // Fetch existing users from localStorage
+        const users = JSON.parse(localStorage.getItem('users')) || [];
 
-        if (email === validEmail && password === validPassword) {
-            // Simulate successful login
-            navigate("/home");
+        const user = users.find(user => user.email === email && user.password === password);
+
+        if (user) {
+            localStorage.setItem('userId', user.email); // login success
+            navigate('/');
         } else {
-            setError(
-                "Invalid email or password. Try 'test@example.com' and 'password123'."
-            );
+            setError("Invalid email or password.");
         }
     };
 
