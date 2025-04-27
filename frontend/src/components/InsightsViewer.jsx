@@ -1,81 +1,65 @@
 import React, { useEffect, useState } from 'react';
-import api from '../api/api'; // Make sure this points correctly to your axios instance
-
-async function generateRandomInsight() {
-    const randomPrompt = "Give me a short random inspirational insight for a classroom setting.";
-    try {
-        const response = await api.post('/api/gemini/generate', { prompt: randomPrompt });
-        const generatedText = response.data.candidates[0].content.parts[0].text;
-        return generatedText;
-    } catch (error) {
-        console.error("Error generating content:", error);
-        return "Failed to generate insight.";
-    }
-}
+import api from '../api/api'; // Your axios instance
 
 function InsightsViewer() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedClass, setSelectedClass] = useState('');
+  const [selectedClassId, setSelectedClassId] = useState('');
   const [insight, setInsight] = useState('');
 
   useEffect(() => {
-    const fetchClassesAndGenerateInsights = async () => {
+    const fetchClasses = async () => {
       try {
         const response = await api.get('/api/classes/all');
-        const fetchedClasses = response.data;
-
-        const updatedClasses = await Promise.all(fetchedClasses.map(async (classItem) => {
-          const randomInsight = await generateRandomInsight(classItem.title, classItem.files || []);
-          return { ...classItem, insights: randomInsight };
-        }));
-
-        setClasses(updatedClasses);
+        setClasses(response.data);
       } catch (error) {
-        console.error('Error fetching classes or generating insights:', error);
+        console.error('Error fetching classes:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchClassesAndGenerateInsights();
+    fetchClasses();
   }, []);
 
-  // Handle class selection from the dropdown
-  const handleClassChange = (e) => {
-    const selectedTitle = e.target.value;
-    setSelectedClass(selectedTitle);
-    
-    // Find the selected class by title
-    const selectedClassItem = classes.find((classItem) => classItem.title === selectedTitle);
-    setInsight(selectedClassItem ? selectedClassItem.insights : '');
+  const handleClassChange = async (e) => {
+    const selectedId = e.target.value;
+    setSelectedClassId(selectedId);
+
+    try {
+      const response = await api.get(`/api/classes/insights/${selectedId}`);
+      setInsight(response.data.insights);
+    } catch (error) {
+      console.error('Error fetching insights:', error);
+      setInsight('Failed to fetch insights.');
+    }
   };
 
   if (loading) {
-    return <div className="loading">Loading insights...</div>;
+    return <div className="loading">Loading classes...</div>;
   }
 
   return (
     <div className="insights-viewer">
       <div className="insights-box">
-        {/* Dropdown to select a class */}
+        {/* Class select dropdown */}
         <select
-          value={selectedClass}
+          value={selectedClassId}
           onChange={handleClassChange}
           className="category-select"
         >
           <option value="" disabled>Select a Class</option>
           {classes.map((classItem) => (
-            <option key={classItem._id} value={classItem.title}>
-              {classItem.title} {/* Displaying class title */}
+            <option key={classItem._id} value={classItem._id}>
+              {classItem.title}
             </option>
           ))}
         </select>
 
-        {/* Display insights for the selected class */}
+        {/* Show insight if available */}
         {insight && (
           <div className="class-insight-card">
-            <h2>{selectedClass}</h2>
+            <h2>Insights</h2>
             <pre>{insight}</pre>
           </div>
         )}
