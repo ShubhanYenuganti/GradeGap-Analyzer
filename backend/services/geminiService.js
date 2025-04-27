@@ -40,10 +40,14 @@ Your Output:
 
   const aiInsights = response.data.candidates?.[0]?.content?.parts?.[0]?.text || '';
   const overallInsights = await synthesizeInsights(courseInsights, aiInsights);
-  const synthesizedJSX = overallInsights.match(/```jsx\s*([\s\S]*?)```/)?.[1]?.trim() || '';
+  let synthesizedJSX = overallInsights.match(/```jsx\s*([\s\S]*?)```/)?.[1]?.trim() || '';
   if (!synthesizedJSX) {
     console.warn('⚠️ Warning: No JSX block found. Returning basic fallback.');
     return '<div>No insights generated. Please try again later.</div>';
+  }
+  // Remove outer <>...</> fragment if present
+  if (synthesizedJSX.startsWith('<>') && synthesizedJSX.endsWith('</>')) {
+    synthesizedJSX = synthesizedJSX.slice(2, -3).trim();
   }
   
   console.log('✅ JSX insights extracted');
