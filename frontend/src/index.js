@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-
-// 🧹 Clear user session on first load
-localStorage.removeItem('userId'); 
+import { AuthProvider } from './context/AuthContext'; // import this!
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-        <App />
+        <AuthProvider> {/* Wrap here */}
+            <App />
+        </AuthProvider>
     </React.StrictMode>
 );

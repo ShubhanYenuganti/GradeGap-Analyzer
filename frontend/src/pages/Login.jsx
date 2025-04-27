@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/NavBar.jsx";
+import { AuthContext } from "../context/AuthContext";
+import api from "../api/api";
 import "../styles/Login.css";
 
 const Login = () => {
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -15,20 +19,17 @@ const Login = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const { email, password } = formData;
 
-        // Fetch existing users from localStorage
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-
-        const user = users.find(user => user.email === email && user.password === password);
-
-        if (user) {
-            localStorage.setItem('userId', user.email); // login success
+        try {
+            const response = await api.post('/api/users/login', { email, password });
+            login(response.data.token, response.data.userId); // call login from context
             navigate('/');
-        } else {
-            setError("Invalid email or password.");
+        } catch (error) {
+            console.error('Login error:', error.response?.data || error.message);
+            setError(error.response?.data?.error || 'Login failed.');
         }
     };
 
@@ -44,7 +45,6 @@ const Login = () => {
                             <input
                                 type="email"
                                 name="email"
-                                placeholder="Email"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
@@ -55,16 +55,13 @@ const Login = () => {
                             <input
                                 type="password"
                                 name="password"
-                                placeholder="Password"
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         {error && <p className="error-text">{error}</p>}
-                        <button type="submit" className="login-button">
-                            Login
-                        </button>
+                        <button type="submit" className="login-button">Login</button>
                     </form>
                     <p className="signup-text">
                         Don't have an account? <Link to="/signup">Sign up here</Link>
