@@ -79,10 +79,12 @@ router.post('/upload', (req, res) => {
             const mimetype = req.file.mimetype;
 
             const { pageBuffers, cleanMimetype } = await prepareFileBuffer(fileUrl, mimetype);
-            const base64Images = pageBuffers.map(pageBuffer => pageBuffer.toString('base64'));
+            const base64Images = pageBuffers.map(pageBuffer => 
+                Buffer.from(pageBuffer).toString('base64')
+              );
+              
 
-            const extractedText = await extractTextFromFile(base64Images, cleanMimetype);
-
+            const extractedText = await extractTextFromFile(base64Images);
             const courseDescription = existingClass.description;
             const type = existingClass.type;
             const courseInsights = existingClass.insights;
