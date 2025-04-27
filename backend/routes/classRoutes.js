@@ -75,8 +75,11 @@ router.post('/upload', (req, res) => {
       const extractedText = await extractTextFromFile(base64Images, cleanMimetype);
 
       // 🧠 Now generate insights using Gemini 2.0
-      const courseDescription = existingClass.description || "This course covers mathematics, statistics, and problem-solving.";
-      const aiInsights = await generateInsights(extractedText, courseDescription);
+      const courseDescription = existingClass.description;
+      const type = existingClass.type;
+      const courseInsights = existingClass.insights;
+      const aiInsights = await generateInsights(extractedText, courseDescription, type, courseInsights);
+      console.log('🔍 AI Insights generated:', aiInsights.length, 'characters');
 
       existingClass.insights = aiInsights;
       await existingClass.save();
