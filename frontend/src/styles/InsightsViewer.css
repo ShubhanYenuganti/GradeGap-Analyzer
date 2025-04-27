@@ -13,12 +13,12 @@
 /* === Global Body Background === */
 body {
   margin: 0;
-  background-color: #0d0d0d;
+  background-color: #0d0d0d; /* You can remove this if your page background is already styled elsewhere */
 }
 
 /* === Header === */
 .header {
-  background-color: #0d0d0d;
+  background-color: transparent;
   color: #ffd700;
   text-align: center;
   padding: 2rem 0;
@@ -32,17 +32,24 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  width: 100vw; /* Full viewport width */
+  min-height: 100vh; /* Full viewport height */
   padding: 2rem;
-  min-height: 80vh;
+  background: none; /* Transparent to show page background */
 }
 
+/* === Insights Box === */
 .insights-box {
   background: #1e1e1e;
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
-  width: 100%;
-  max-width: 850px;
+  
+  width: 90%;
+  max-width: 1200px;
+  min-width: 300px;
+
+  transition: width 0.3s ease, padding 0.3s ease;
 }
 
 /* === Dropdown === */
@@ -89,15 +96,15 @@ body {
 
 /* === Special Styling for Sections === */
 .insight-achievement {
-  border-left: 6px solid #28a745; /* green */
+  border-left: 6px solid #28a745; /* green for strengths */
 }
 
 .insight-focus {
-  border-left: 6px solid #ffc107; /* yellow */
+  border-left: 6px solid #ffc107; /* yellow for focus areas */
 }
 
 .insight-growth {
-  border-left: 6px solid #17a2b8; /* blue */
+  border-left: 6px solid #17a2b8; /* blue for growth steps */
 }
 
 /* === Section Titles === */
@@ -133,9 +140,10 @@ body {
   margin-top: 2rem;
 }
 
-/* === Responsive Tweaks === */
+/* === Responsive Tweaks for Mobile === */
 @media (max-width: 768px) {
   .insights-box {
+    width: 95%;
     padding: 1.5rem;
   }
 

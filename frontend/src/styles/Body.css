@@ -360,25 +360,3 @@ section {
 
 
 
-/* Add a gradient background to the welcome section */
-.welcome-header {
-  background: var(--gradient); /* Linear gradient as background */
-  padding: 4rem 1rem;
-  text-align: center;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  margin-top: 4rem; /* Adjust for spacing from navbar */
-  position: relative; /* To control background overlay */
-}
-
-/* Optional: Add a subtle image background to the entire page */
-body {
-  background: var(--bg-color); /* Keep the existing background color */
-}
-
-/* Optional: Pattern background image (if you want a subtle texture for the page) */
-body {
-  background-image: url('./b1.jpg'); /* Use a pattern image */
-  background-repeat: repeat; /* Repeat the pattern across the page */
-  background-attachment: fixed; /* Keep background fixed on scroll */
-}
