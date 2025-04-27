@@ -25,9 +25,9 @@ Student Exam Content:
 ${parsedText}
 
 Your Output:
-- Common mistakes made
-- Topics needing review
-- Strengths of the student
+- Common mistakes the student made
+- Topics that need additional review
+- Student's strengths and weaknesses
 - Motivational, specific advice
 - Write in clear professional English
 ` }

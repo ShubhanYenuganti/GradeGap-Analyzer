@@ -15,7 +15,7 @@ async function extractTextFromFile(pageBuffers) {
               inlineData: { mimeType: "image/png", data: buffer.toString('base64') }
             })),
             { text: `
-This document contains handwritten math exams/homework.
+This document contains handwritten exams and homework.
 
 Extract:
 - All questions and answers visible
